@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Multi-Path-Story</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style>
+      table,
+      th,
+      td {
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <a th:href="@{story}">Back to the start</a>
+    
+    <table style="width:100%">
+    
+      <tr>
+        <td></td>
+        <td>
+          <div th:if="${top == null}">
+            <form th:action="@{story?centre={path}(path=${centre})}" method="post">
+              <input type="text" name="top" value="" />
+              <br>
+              <input type="submit" value="Submit" />
+            </form>
+          </div>
+          <a th:href="@{story(centre=${top})}"><span th:text="${top}"></span></a>
+          <br />
+        </td>
+        <td></td>
+      </tr>
+
+      <tr>
+        <td>
+          <div th:if="${left == null}">
+            <form th:action="@{story?centre={path}(path=${centre})}" method="post">
+              <input type="text" name="left" />
+              <br>
+              <input type="submit" value="Submit" />
+            </form>
+          </div>
+          <a th:href="@{story(centre=${left})}"><span th:text="${left}"></span></a>
+          <br />
+        </td>
+
+        <td><p th:text="${centre}"></p></td>
+
+        <td>
+          <div th:if="${right == null}">
+            <form th:action="@{story?centre={path}(path=${centre})}" method="post">
+              <input type="text" name="right" />
+              <br>
+             <input type="submit" value="Submit" />
+            </form>
+          </div>
+          <a th:href="@{story(centre=${right})}"><span th:text="${right}"></span
+          ></a>
+          <br />
+        </td>
+      </tr>
+
+      <tr>
+        <td></td>
+        <td>
+          <div th:if="${bottom == null}">
+            <form th:action="@{story?centre={path}(path=${centre})}" method="post">
+              <input type="text" name="bottom" value="" />
+              <br>	
+            <input type="submit" value="Submit" />     
+            </form>
+          </div>
+          <a th:href="@{story(centre=${bottom})}"><span th:text="${bottom}"></span></a>
+          <br />
+        </td>
+        <td></td>
+      </tr>
+    </table>
+  </body>
+</html>
