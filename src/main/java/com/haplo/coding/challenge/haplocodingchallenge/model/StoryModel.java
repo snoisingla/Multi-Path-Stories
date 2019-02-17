@@ -6,6 +6,19 @@ public class StoryModel {
 	private String bottom;
 	private String left;
 	private String right;
+	
+	public StoryModel() {
+		
+	}
+	
+	public StoryModel(String centre, String top, String bottom, String left, String right) {
+		super();
+		this.centre = centre;
+		this.top = top;
+		this.bottom = bottom;
+		this.left = left;
+		this.right = right;
+	}
 	public String getCentre() {
 		return centre;
 	}

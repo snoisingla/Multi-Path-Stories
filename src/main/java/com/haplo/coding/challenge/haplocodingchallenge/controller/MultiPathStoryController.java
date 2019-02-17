@@ -21,59 +21,100 @@ import com.haplo.coding.challenge.haplocodingchallenge.model.StoryModel;
 public class MultiPathStoryController implements ErrorController{
 	
 	private static final String PATH = "/error";
-	private static HashMap<String, HashMap<String, String[]>> usersStoriesMap = new HashMap<>();
+	private static HashMap<String, HashMap<String, StoryModel>> usersStoriesMap = new HashMap<>();
 	
 	@GetMapping(path = "/story") 
 	public ModelAndView story(@CookieValue(value = "userID", defaultValue = "0000") String userID,
-			HttpServletResponse response, @RequestParam(value = "centre", defaultValue = "This is the start of story.") String centre) {
+			HttpServletResponse response, @RequestParam(value = "centre", defaultValue = "This is the start of story.") String centre, 
+			@RequestParam(value = "pageCode", defaultValue = "00") String pageCode) {
 		
 		userID = generateUserIdAndSetCookie(userID, response);
 		
-		return generateUpdatedHTML(usersStoriesMap.get(userID),centre);	
+		if(!usersStoriesMap.get(userID).containsKey("00")) { //base case
+			usersStoriesMap.get(userID).put(pageCode, new StoryModel(centre,null,null,null,null));
+		}
+		
+		return generateUpdatedHTML(usersStoriesMap.get(userID),centre, pageCode);	
 	}
 	
 	@PostMapping(path = "/story")
 	public ModelAndView onSubmit(@CookieValue(value = "userID", defaultValue = "0000") String userID,
-			HttpServletResponse response, @RequestParam(value = "centre", defaultValue = "This is the start of story.") String centre,
-	@ModelAttribute("storyModel") StoryModel storyModel) {
+			HttpServletResponse response, @RequestParam(value = "centre") String centre,
+			@RequestParam(value = "pageCode", defaultValue = "00") String pageCode,
+			@ModelAttribute("storyModel") StoryModel storyModel) {
 		
 		userID = generateUserIdAndSetCookie(userID, response);
 		
-		updateStoryMap(storyModel,usersStoriesMap.get(userID),centre);
-		return generateUpdatedHTML(usersStoriesMap.get(userID),centre);
+		updateStoryMap(storyModel,usersStoriesMap.get(userID),centre, pageCode);
+		return generateUpdatedHTML(usersStoriesMap.get(userID),centre,pageCode);
 	}
 	
 	private String generateRandonUserId() {
 		return Integer.toString(new Random().nextInt(100000000));
 	}
 	
-	private void updateStoryMap(StoryModel storyModel, HashMap<String, String[]> storyMap, String centre){
-		if(!storyMap.containsKey(centre)) {
-			storyMap.put(centre, new String[4]);
+	private String generateUpdatedPageCode(String pageCode, String sentenceType) {
+		int nextPageNum = Integer.parseInt(pageCode.substring(0,1)) + 1;
+		String nextPageNumString = Integer.toString(nextPageNum);
+		if(sentenceType.equals("top")) {
+			return nextPageNumString + 't';
 		}
+		if(sentenceType.equals("bottom")) {
+			return nextPageNumString + 'b';
+		}
+		if(sentenceType.equals("left")) {
+			return nextPageNumString + 'l';
+		}
+		if(sentenceType.equals("right")) {
+			return nextPageNumString + 'r';
+		}
+		return pageCode;
+	}
+	
+	private void updateStoryMap(StoryModel storyModel, HashMap<String, StoryModel> storyMap, String centre, String pageCode){
+		if(!storyMap.containsKey(pageCode)) {
+			storyMap.put(pageCode, new StoryModel());
+		}
+		storyMap.get(pageCode).setCentre(centre);	
+		
+		
 		if(storyModel.getTop() != null && !storyModel.getTop().isEmpty()) {
-			storyMap.get(centre)[0] = storyModel.getTop();
+			storyMap.get(pageCode).setTop(storyModel.getTop()); //update hashmap for current pagecode
+			//update hashmap for updated pagecode
+			storyMap.put(generateUpdatedPageCode(pageCode,"top"), new StoryModel(storyModel.getTop(),null,null,null,null)); 
 		}
 		if(storyModel.getBottom() != null && !storyModel.getBottom().isEmpty()) {
-			storyMap.get(centre)[1] = storyModel.getBottom();
+			storyMap.get(pageCode).setBottom(storyModel.getBottom());
+			storyMap.put(generateUpdatedPageCode(pageCode,"bottom"), new StoryModel (storyModel.getBottom(),null,null,null,null));
 		}
 		if(storyModel.getLeft() != null && !storyModel.getLeft().isEmpty()) {
-			storyMap.get(centre)[2] = storyModel.getLeft();
+			storyMap.get(pageCode).setLeft(storyModel.getLeft());
+			storyMap.put(generateUpdatedPageCode(pageCode,"left"), new StoryModel(storyModel.getLeft(),null,null,null,null));
 		}
 		if(storyModel.getRight() != null && !storyModel.getRight().isEmpty()) {
-			storyMap.get(centre)[3] = storyModel.getRight();
+			storyMap.get(pageCode).setRight(storyModel.getRight());
+			storyMap.put(generateUpdatedPageCode(pageCode,"right"), new StoryModel(storyModel.getRight(),null,null,null,null));
 		}	
 	}
 	
-	private ModelAndView generateUpdatedHTML(HashMap<String, String[]> storyMap, String centre) {
+	
+	private ModelAndView generateUpdatedHTML(HashMap<String, StoryModel> storyMap, String centre, 
+			String pageCode) {
+		
 		ModelAndView mav = new ModelAndView("story");
 		mav.addObject("centre",centre);
-		String[] mapValuesArray = storyMap.get(centre);
-		if(mapValuesArray != null) {
-			mav.addObject("top", mapValuesArray[0]);
-			mav.addObject("bottom", mapValuesArray[1]);
-			mav.addObject("left",mapValuesArray[2]);
-			mav.addObject("right",mapValuesArray[3]);
+		mav.addObject("currentPageCode",pageCode);
+		mav.addObject("topUpdatedPageCode",generateUpdatedPageCode(pageCode,"top"));
+		mav.addObject("bottomUpdatedPageCode",generateUpdatedPageCode(pageCode,"bottom"));
+		mav.addObject("leftUpdatedPageCode",generateUpdatedPageCode(pageCode,"left"));
+		mav.addObject("rightUpdatedPageCode",generateUpdatedPageCode(pageCode,"right"));
+			
+		StoryModel mapValues = storyMap.get(pageCode);
+		if(mapValues != null) {
+			mav.addObject("top", mapValues.getTop());
+			mav.addObject("bottom", mapValues.getBottom());
+			mav.addObject("left",mapValues.getLeft());
+			mav.addObject("right",mapValues.getRight());
 		}
 		return mav;	
 	}
@@ -84,7 +125,7 @@ public class MultiPathStoryController implements ErrorController{
 			response.addCookie(new Cookie("userID", userID));
 		}
 		if(!usersStoriesMap.containsKey(userID)) {
-			usersStoriesMap.put(userID, new HashMap<String,String[]>());
+			usersStoriesMap.put(userID, new HashMap<String,StoryModel>());
 		}
 		return userID;
 	}
@@ -96,3 +137,4 @@ public class MultiPathStoryController implements ErrorController{
 	}
 
 }
+

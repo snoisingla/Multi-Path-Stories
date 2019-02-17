@@ -19,14 +19,14 @@
       <tr>
         <td></td>
         <td>
-          <div th:if="${top == null}">
-            <form th:action="@{story?centre={path}(path=${centre})}" method="post">
+          <div th:if="${top == null}">          
+            <form th:action="@{story(centre=${centre},pageCode=${currentPageCode})}" method="post">  
               <input type="text" name="top" value="" />
               <br>
               <input type="submit" value="Submit" />
             </form>
           </div>
-          <a th:href="@{story(centre=${top})}"><span th:text="${top}"></span></a>
+          <a th:href="@{story(centre=${top},pageCode=${topUpdatedPageCode})}"><span th:text="${top}"></span></a>
           <br />
         </td>
         <td></td>
@@ -35,13 +35,13 @@
       <tr>
         <td>
           <div th:if="${left == null}">
-            <form th:action="@{story?centre={path}(path=${centre})}" method="post">
+            <form th:action="@{story(centre=${centre},pageCode=${currentPageCode})}" method="post">
               <input type="text" name="left" />
               <br>
               <input type="submit" value="Submit" />
             </form>
           </div>
-          <a th:href="@{story(centre=${left})}"><span th:text="${left}"></span></a>
+          <a th:href="@{story(centre=${left},pageCode=${leftUpdatedPageCode})}"><span th:text="${left}"></span></a>
           <br />
         </td>
 
@@ -49,13 +49,13 @@
 
         <td>
           <div th:if="${right == null}">
-            <form th:action="@{story?centre={path}(path=${centre})}" method="post">
+            <form th:action="@{story(centre=${centre},pageCode=${currentPageCode})}" method="post">
               <input type="text" name="right" />
               <br>
              <input type="submit" value="Submit" />
             </form>
           </div>
-          <a th:href="@{story(centre=${right})}"><span th:text="${right}"></span
+          <a th:href="@{story(centre=${right},pageCode=${rightUpdatedPageCode})}"><span th:text="${right}"></span
           ></a>
           <br />
         </td>
@@ -65,13 +65,13 @@
         <td></td>
         <td>
           <div th:if="${bottom == null}">
-            <form th:action="@{story?centre={path}(path=${centre})}" method="post">
+            <form th:action="@{story(centre=${centre},pageCode=${currentPageCode})}" method="post">
               <input type="text" name="bottom" value="" />
               <br>	
             <input type="submit" value="Submit" />     
             </form>
           </div>
-          <a th:href="@{story(centre=${bottom})}"><span th:text="${bottom}"></span></a>
+          <a th:href="@{story(centre=${bottom},pageCode=${bottomUpdatedPageCode})}"><span th:text="${bottom}"></span></a>
           <br />
         </td>
         <td></td>
@@ -79,3 +79,4 @@
     </table>
   </body>
 </html>
+            <!-- <form th:action="@{story(centre=${centre})}" method="post"> --> 
